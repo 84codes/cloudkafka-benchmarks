@@ -43,8 +43,7 @@ func (b ProducerBenchmark) generateMessage() *kafka.Message {
 }
 
 func (b ProducerBenchmark) Config() string {
-	return fmt.Sprintf(
-		"Producer Config\n Messages:\t%d\n Size:\t\t%d\n Ack:\t\t%d",
+	return fmt.Sprintf("Producer Config: messages=%d size=%d ack=%d",
 		b.NumMessages, b.MessageSize, int(b.Ack))
 }
 
