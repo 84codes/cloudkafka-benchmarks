@@ -8,39 +8,41 @@ import (
 )
 
 type Latency struct {
-	ConnDetails ConnectionDetails
+	c Client
 }
 
-func LatencyBench(d ConnectionDetails) Latency {
-	return Latency{ConnDetails: d}
+func LatencyBench(c Client) Latency {
+	return Latency{c: c}
 }
 func (l Latency) Config() string {
 	return "Latency"
 }
-func (l Latency) Run() (Stats, error) {
+func (l Latency) Stat() *Stats {
+	return &Stats{}
+
+}
+func (l Latency) Run() error {
 	consumer := ConsumerBenchmark{
-		ConnectionDetails: l.ConnDetails,
-		NumMessages:       *messages,
-		Batch:             *size,
-		Offset:            kafka.OffsetEnd,
+		Client: l.c,
+		Batch:  *size,
+		Offset: kafka.OffsetEnd,
 	}
 	producer := ProducerBenchmark{
-		ConnectionDetails: l.ConnDetails,
-		NumMessages:       *messages,
-		MessageSize:       *size,
-		Ack:               Acknowledge(*ack),
+		Client:      l.c,
+		MessageSize: *size,
+		Ack:         Acknowledge(*ack),
 	}
-	done := make(chan Stats)
+	done := make(chan *Stats)
 	go func() {
-		s, err := consumer.Run()
+		err := consumer.Run()
 		if err != nil {
 			fmt.Println("[ERROR]", err)
 			os.Exit(1)
 		}
-		done <- s
+		done <- consumer.Stat()
 	}()
-	if _, err := producer.Run(); err != nil {
-		return Stats{}, err
+	if err := producer.Run(); err != nil {
+		return err
 	}
-	return <-done, nil
+	return nil
 }

@@ -39,8 +39,8 @@ func getClient(benchType string) Benchmark {
 			MessageSize: *size,
 			Ack:         Acknowledge(*ack),
 		}
-	//case "latency":
-	//		return LatencyBench(d)
+	case "latency":
+		return LatencyBench(c)
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid benchmark type %s", benchType)
 		os.Exit(1)
