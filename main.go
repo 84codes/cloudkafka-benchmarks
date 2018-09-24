@@ -78,7 +78,7 @@ func parseConfigFile(path string) error {
 func statsInterval(b Benchmark) chan bool {
 	quit := make(chan bool)
 	if *stats == 0 {
-		return quit
+		return nil
 	}
 	ticker := time.NewTicker(time.Duration(*stats) * time.Second)
 	go func() {
@@ -114,11 +114,13 @@ func main() {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	q <- true
+	if q != nil {
+		q <- true
+	}
 	json, err := b.Stat().MarshalJSON()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, err.Error())
 		os.Exit(1)
 	}
-	fmt.Print(json)
+	fmt.Print(string(json))
 }
